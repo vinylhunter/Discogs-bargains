@@ -1,4 +1,4 @@
-<!DOCTYPE html<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,33 +8,75 @@
 </head>
 <body>
 
-    <header>
-        <h1>Discogs Bargain Finder</h1>
-        <p>Find undervalued records by format, genre, and year.</p>
-    </header>
+<header>
+    <h1>Discogs Bargain Finder</h1>
+    <p>Find undervalued records by format, genre, and year.</p>
+</header>
 
-    <section class="controls">
-        <label>Format:</label>
-        <input id="format" type="text" placeholder="e.g. Vinyl">
-<br>
-    <label>Condition:</label>
-        <input id="condition" type="text" placeholder="e.g. VG+">
-<br>
-        <label>Genre:</label>
-        <input id="genre" type="text" placeholder="e.g. Reggae">
-<br>
-        <label>Year:</label>
-        <input id="year" type="number" placeholder="e.g. 1968">
-<br><br>
-        <button onclick="searchBargains()">Search Bargains</button>
+<main>
+    <form id="searchForm">
+
+        <div class="row">
+            <label>Search:</label>
+            <input id="q" type="text" placeholder="Artist, title, label…">
+        </div>
+
+        <div class="row">
+            <label>Format:</label>
+            <input id="format" type="text" placeholder="Vinyl">
+        </div>
+
+        <div class="row">
+            <label>Genre:</label>
+            <input id="genre" type="text" placeholder="Reggae">
+        </div>
+
+        <div class="row">
+            <label>Year From:</label>
+            <input id="year_from" type="number" placeholder="1968">
+        </div>
+
+        <div class="row">
+            <label>Year To:</label>
+            <input id="year_to" type="number" placeholder="1975">
+        </div>
+
+        <div class="row">
+            <label>Max results:</label>
+            <input id="max_results" type="number" value="100">
+        </div>
+
+        <div class="row actions">
+            <button type="submit">Search</button>
+            <button type="button" id="clear">Clear</button>
+        </div>
+
+        <div id="status" class="note"></div>
+    </form>
+
+    <section id="resultsSection" hidden>
+        <p id="summary" class="note"></p>
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Cover</th>
+                    <th>Title</th>
+                    <th>Year</th>
+                    <th>Format</th>
+                    <th>Link</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </section>
+</main>
 
-    <section id="results"></section>
+<footer>
+    <p>Powered by Discogs (unofficial tool)</p>
+</footer>
 
-    <footer>
-        <p>Powered by Discogs (unofficial tool)</p>
-    </footer>
+<script src="script.js"></script>
 
-    <script src="script.js"></script>
 </body>
 </html>
