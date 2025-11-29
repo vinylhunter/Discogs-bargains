@@ -1,48 +1,36 @@
-// Replace this with the URL of your Cloudflare Worker
-const API_BASE = "https://weathered-boat-3ab5.russellcliffe.workers.dev/";
+document.getElementById('searchForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-async function searchBargains() {
-    const format = document.getElementById("format").value;
-    const genre = document.getElementById("genre").value;
-    const year = document.getElementById("year").value;
-    const condition = document.getElementById("condition").value;
+  const genre = document.getElementById('genre').value;
+  const format = document.getElementById('format').value;
+  const year = document.getElementById('year').value;
+  const condition = document.getElementById('condition').value;
 
-    const resultsDiv = document.getElementById("results");
-    resultsDiv.innerHTML = "<p>Searching Discogs…</p>";
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = '<p>Loading...</p>';
 
-    let url = `${API_BASE}/search?format=${encodeURIComponent(format)}&genre=${encodeURIComponent(genre)}&year=${encodeURIComponent(year)}&condition=${encodeURIComponent(condition)}`;
+  try {
+    const params = new URLSearchParams({ genre, format, year, condition });
+    const res = await fetch(`/api/search?${params.toString()}`);
+    const data = await res.json();
 
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (!data.results || data.results.length === 0) {
-            resultsDiv.innerHTML = "<p>No results found.</p>";
-            return;
-        }
-
-        // Display results
-        let html = "<h2>Results:</h2>";
-        html += "<ul>";
-
-        data.results.forEach(item => {
-            html += `
-                <li>
-                    <strong>${item.title}</strong><br>
-                    Artist: ${item.artist || "Unknown"}<br>
-                    Year: ${item.year || "Unknown"}<br>
-                    Format: ${item.format ? item.format.join(", ") : "N/A"}<br>
-                    <a href="https://discogs.com${item.uri}" target="_blank">View on Discogs</a>
-                </li>
-                <br>
-            `;
-        });
-
-        html += "</ul>";
-        resultsDiv.innerHTML = html;
-
-    } catch (err) {
-        resultsDiv.innerHTML = "<p>Error loading data.</p>";
-        console.error(err);
+    if (!data.length) {
+      resultsDiv.innerHTML = '<p>No bargains found.</p>';
+      return;
     }
-}
+
+    resultsDiv.innerHTML = '';
+    data.forEach(item => {
+      const div = document.createElement('div');
+      div.classList.add('result-item');
+      div.innerHTML = `
+        <strong>${item.title}</strong> (${item.year})<br>
+        Format: ${item.format} | Condition: ${item.condition} | Price: $${item.price.value}<br>
+        <a href="${item.marketplace_url}" target="_blank">View on Discogs</a>
+      `;
+      resultsDiv.appendChild(div);
+    });
+  } catch (err) {
+    resultsDiv.innerHTML = `<p>Error: ${err.message}</p>`;
+  }
+});
