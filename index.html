@@ -7,34 +7,25 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <header>
+  <div class="container">
     <h1>Discogs Bargain Finder</h1>
-    <p>Find undervalued records by format, genre and year.</p>
-  </header>
-
-  <section class="controls">
-    <label>Format:</label><br>
-    <input id="format" type="text" placeholder="e.g. Vinyl"><br>
-
-    <label>Condition:</label><br>
-    <input id="condition" type="text" placeholder="e.g. VG+"><br>
-
-    <label>Genre:</label><br>
-    <input id="genre" type="text" placeholder="e.g. Reggae"><br>
-
-    <label>Year:</label><br>
-    <input id="year" type="number" placeholder="e.g. 1968"><br><br>
-
-    <button type="button" onclick="searchBargains()">Search Bargains</button>
-  </section>
-
-  <section id="results"></section>
-
-  <footer>
-    <p>Powered by Discogs (unofficial tool)</p>
-  </footer>
-
+    <form id="searchForm">
+      <label>Genre:
+        <input type="text" id="genre" placeholder="e.g. Rock">
+      </label>
+      <label>Format:
+        <input type="text" id="format" placeholder="e.g. Vinyl">
+      </label>
+      <label>Year:
+        <input type="number" id="year" placeholder="e.g. 1990">
+      </label>
+      <label>Condition:
+        <input type="text" id="condition" placeholder="e.g. Mint">
+      </label>
+      <button type="submit">Search</button>
+    </form>
+    <div id="results"></div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
