@@ -1,6 +1,7 @@
 document.getElementById('searchForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  // Get form values
   const genre = document.getElementById('genre').value;
   const format = document.getElementById('format').value;
   const year = document.getElementById('year').value;
@@ -10,8 +11,11 @@ document.getElementById('searchForm').addEventListener('submit', async (e) => {
   resultsDiv.innerHTML = '<p>Loading...</p>';
 
   try {
+    // Replace this URL with your Worker deployment URL if different
+    const workerURL = 'https://weathered-boat-3ab5.russellcliffe.workers.dev/';
+
     const params = new URLSearchParams({ genre, format, year, condition });
-    const res = await fetch(`/api/search?${params.toString()}`);
+    const res = await fetch(`${workerURL}?${params.toString()}`);
     const data = await res.json();
 
     if (!data.length) {
@@ -19,6 +23,7 @@ document.getElementById('searchForm').addEventListener('submit', async (e) => {
       return;
     }
 
+    // Display results
     resultsDiv.innerHTML = '';
     data.forEach(item => {
       const div = document.createElement('div');
@@ -30,6 +35,7 @@ document.getElementById('searchForm').addEventListener('submit', async (e) => {
       `;
       resultsDiv.appendChild(div);
     });
+
   } catch (err) {
     resultsDiv.innerHTML = `<p>Error: ${err.message}</p>`;
   }
