@@ -1,1 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discogs Bargain Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Discogs Bargain Finder</h1>
+        <p>Find undervalued records by format, genre, and year.</p>
+    </header>
+
+    <section class="controls">
+        <label>Format:</label>
+        <input id="format" type="text" placeholder="e.g. Vinyl">
+
+        <label>Genre:</label>
+        <input id="genre" type="text" placeholder="e.g. Rock">
+
+        <label>Year:</label>
+        <input id="year" type="number" placeholder="e.g. 1990">
+
+        <button onclick="searchBargains()">Search Bargains</button>
+    </section>
+
+    <section id="results"></section>
+
+    <footer>
+        <p>Powered by Discogs (unofficial tool)</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
 
