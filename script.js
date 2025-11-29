@@ -5,7 +5,7 @@
 // set USE_BACKEND = false and put your Discogs personal token in DISCOGS_USER_TOKEN.
 // WARNING: putting your token in client-side code will expose it publicly.
 const USE_BACKEND = true;
-const API_BASE = 'https://your-backend.example.com'; // <-- replace with your backend URL when you have one
+const API_BASE = 'https://weathered-boat-3ab5.russellcliffe.workers.dev/'; // <-- replace with your backend URL when you have one
 
 // If you prefer no-backend quick test, set USE_BACKEND = false and fill this:
 const DISCOGS_USER_TOKEN = ''; // <-- your Discogs personal access token if USE_BACKEND=false
