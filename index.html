@@ -39,9 +39,8 @@
     const form = document.getElementById('searchForm');
     const resultsDiv = document.getElementById('results');
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
-
       const genre = document.getElementById('genre').value;
       const format = document.getElementById('format').value;
       const year = document.getElementById('year').value;
@@ -49,14 +48,10 @@
       resultsDiv.innerHTML = 'Searching...';
 
       try {
-        const token = 'EsFKFmZYYGxDhxsebDiYGpqfvalcrASVQKcLtdYU'; // <-- Replace with your token
-        const searchUrl = `https://api.discogs.com/database/search?genre=${genre}&format=${format}&year=${year}`;
-
-        const response = await fetch(searchUrl, {
-          headers: { 'Authorization': `Discogs token=${token}` }
-        });
-
-        const data = await response.json();
+        // Replace '/api/search' with your Worker URL
+        const workerUrl = `https://weathered-boat-3ab5.russellcliffe.workers.dev/?genre=${genre}&format=${format}&year=${year}`;
+        const res = await fetch(workerUrl);
+        const data = await res.json();
 
         if (!data.results || data.results.length === 0) {
           resultsDiv.innerHTML = 'No results found.';
@@ -64,53 +59,25 @@
         }
 
         resultsDiv.innerHTML = '';
-
-        // Limit to first 5 releases to avoid API throttling
-        for (const record of data.results.slice(0, 5)) {
-          const listingsUrl = `https://api.discogs.com/marketplace/search?release_id=${record.id}`;
-
-          const listingsResponse = await fetch(listingsUrl, {
-            headers: { 'Authorization': `Discogs token=${token}` }
-          });
-
-          const listingsData = await listingsResponse.json();
-
-          const prices = listingsData.results
-            .filter(item => item.price && item.price.value > 0)
-            .map(item => item.price.value);
-
-          let medianPrice = 0;
-          let lowestPrice = 0;
-
-          if (prices.length > 0) {
-            prices.sort((a, b) => a - b);
-            const mid = Math.floor(prices.length / 2);
-            medianPrice = prices.length % 2 === 0
-              ? (prices[mid - 1] + prices[mid]) / 2
-              : prices[mid];
-            lowestPrice = prices[0];
-          }
-
-          const isUndervalued = lowestPrice > 0 && lowestPrice < medianPrice;
-
+        data.results.forEach(record => {
           const div = document.createElement('div');
           div.classList.add('record');
           div.innerHTML = `
             <strong>${record.title}</strong><br>
-            Artist: ${record.artist || 'Unknown'}<br>
-            Year: ${record.year || 'Unknown'}<br>
-            Format: ${record.format ? record.format.join(', ') : 'Unknown'}<br>
-            Lowest Price: $${lowestPrice.toFixed(2)} | Median Price: $${medianPrice.toFixed(2)} <br>
-            ${isUndervalued ? '<span class="undervalued">Undervalued!</span>' : ''}
+            Artist: ${record.artist}<br>
+            Year: ${record.year}<br>
+            Format: ${record.format.join(', ')}<br>
+            Lowest Price: $${record.lowestPrice.toFixed(2)} | Median Price: $${record.medianPrice.toFixed(2)}<br>
+            ${record.isUndervalued ? '<span class="undervalued">Undervalued!</span>' : ''}
             <br>
-            <a href="${record.uri}" target="_blank">View on Discogs</a>
+            <a href="${record.discogsUrl}" target="_blank">View on Discogs</a>
           `;
           resultsDiv.appendChild(div);
-        }
+        });
 
-      } catch (error) {
-        resultsDiv.innerHTML = 'Error fetching data. Check your token and network.';
-        console.error(error);
+      } catch (err) {
+        resultsDiv.innerHTML = 'Error fetching data from Worker.';
+        console.error(err);
       }
     });
   </script>
