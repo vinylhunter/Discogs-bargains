@@ -8,6 +8,7 @@
     body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
     input, select, button { margin: 5px 0; padding: 8px; width: 100%; max-width: 300px; }
     .record { border-bottom: 1px solid #ddd; padding: 10px 0; }
+    .undervalued { background-color: #d4edda; padding: 5px; border-radius: 5px; }
   </style>
 </head>
 <body>
@@ -28,14 +29,6 @@
     <label>Year:</label>
     <input type="number" id="year" placeholder="e.g., 1980">
 
-    <label>Condition:</label>
-    <select id="condition">
-      <option value="">Any</option>
-      <option value="Mint">Mint</option>
-      <option value="Near Mint">Near Mint</option>
-      <option value="Very Good">Very Good</option>
-    </select>
-
     <button type="submit">Search</button>
   </form>
 
@@ -52,16 +45,14 @@
       const genre = document.getElementById('genre').value;
       const format = document.getElementById('format').value;
       const year = document.getElementById('year').value;
-      const condition = document.getElementById('condition').value;
 
       resultsDiv.innerHTML = 'Searching...';
 
       try {
-        // Replace 'YOUR_DISCOGS_TOKEN' with your personal token
         const token = 'EsFKFmZYYGxDhxsebDiYGpqfvalcrASVQKcLtdYU';
-        const url = `https://api.discogs.com/database/search?genre=${genre}&format=${format}&year=${year}&token=${token}`;
+        const searchUrl = `https://api.discogs.com/database/search?genre=${genre}&format=${format}&year=${year}&token=${token}`;
 
-        const response = await fetch(url);
+        const response = await fetch(searchUrl);
         const data = await response.json();
 
         if (!data.results || data.results.length === 0) {
@@ -70,7 +61,18 @@
         }
 
         resultsDiv.innerHTML = '';
-        data.results.forEach(record => {
+
+        for (const record of data.results) {
+          // Fetch release details to get median and lowest price
+          const releaseUrl = `https://api.discogs.com/releases/${record.id}`;
+          const releaseResponse = await fetch(releaseUrl);
+          const releaseData = await releaseResponse.json();
+
+          const medianPrice = releaseData?.market?.median_price || 0;
+          const lowestPrice = releaseData?.lowest_price || 0;
+
+          const isUndervalued = lowestPrice > 0 && lowestPrice < medianPrice;
+
           const div = document.createElement('div');
           div.classList.add('record');
           div.innerHTML = `
@@ -78,10 +80,13 @@
             Artist: ${record.artist || 'Unknown'}<br>
             Year: ${record.year || 'Unknown'}<br>
             Format: ${record.format ? record.format.join(', ') : 'Unknown'}<br>
+            Lowest Price: $${lowestPrice} | Median Price: $${medianPrice} <br>
+            ${isUndervalued ? '<span class="undervalued">Undervalued!</span>' : ''}
+            <br>
             <a href="${record.uri}" target="_blank">View on Discogs</a>
           `;
           resultsDiv.appendChild(div);
-        });
+        }
 
       } catch (error) {
         resultsDiv.innerHTML = 'Error fetching data.';
