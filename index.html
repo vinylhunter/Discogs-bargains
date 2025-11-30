@@ -7,25 +7,30 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Discogs Bargain Finder</h1>
-    <form id="searchForm">
-      <label>Genre:
-        <input type="text" id="genre" placeholder="e.g. Rock">
-      </label>
-      <label>Format:
-        <input type="text" id="format" placeholder="e.g. Vinyl">
-      </label>
-      <label>Year:
-        <input type="number" id="year" placeholder="e.g. 1990">
-      </label>
-      <label>Condition:
-        <input type="text" id="condition" placeholder="e.g. Mint">
-      </label>
-      <button type="submit">Search</button>
-    </form>
-    <div id="results"></div>
-  </div>
+  <h1>Discogs Bargain Finder (Test Mode)</h1>
+
+  <form id="search-form">
+    <label>
+      Release ID:
+      <input type="text" id="release_id" placeholder="e.g., 249504" required>
+    </label>
+    <label>
+      Genre:
+      <input type="text" id="genre" placeholder="Pop, Rock, etc.">
+    </label>
+    <label>
+      Format:
+      <input type="text" id="format" placeholder="Vinyl, CD, etc.">
+    </label>
+    <label>
+      Year:
+      <input type="number" id="year" placeholder="1987">
+    </label>
+    <button type="submit">Search</button>
+  </form>
+
+  <div id="results"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
