@@ -65,17 +65,32 @@
 
         resultsDiv.innerHTML = '';
 
-        // Limit to first 5 results to avoid API throttling
+        // Limit to first 5 releases to avoid API throttling
         for (const record of data.results.slice(0, 5)) {
-          const releaseUrl = `https://api.discogs.com/releases/${record.id}`;
-          const releaseResponse = await fetch(releaseUrl, {
+          const listingsUrl = `https://api.discogs.com/marketplace/search?release_id=${record.id}`;
+
+          const listingsResponse = await fetch(listingsUrl, {
             headers: { 'Authorization': `Discogs token=${token}` }
           });
 
-          const releaseData = await releaseResponse.json();
+          const listingsData = await listingsResponse.json();
 
-          const medianPrice = releaseData?.market?.median_price || 0;
-          const lowestPrice = releaseData?.lowest_price || 0;
+          const prices = listingsData.results
+            .filter(item => item.price && item.price.value > 0)
+            .map(item => item.price.value);
+
+          let medianPrice = 0;
+          let lowestPrice = 0;
+
+          if (prices.length > 0) {
+            prices.sort((a, b) => a - b);
+            const mid = Math.floor(prices.length / 2);
+            medianPrice = prices.length % 2 === 0
+              ? (prices[mid - 1] + prices[mid]) / 2
+              : prices[mid];
+            lowestPrice = prices[0];
+          }
+
           const isUndervalued = lowestPrice > 0 && lowestPrice < medianPrice;
 
           const div = document.createElement('div');
@@ -85,7 +100,7 @@
             Artist: ${record.artist || 'Unknown'}<br>
             Year: ${record.year || 'Unknown'}<br>
             Format: ${record.format ? record.format.join(', ') : 'Unknown'}<br>
-            Lowest Price: $${lowestPrice} | Median Price: $${medianPrice} <br>
+            Lowest Price: $${lowestPrice.toFixed(2)} | Median Price: $${medianPrice.toFixed(2)} <br>
             ${isUndervalued ? '<span class="undervalued">Undervalued!</span>' : ''}
             <br>
             <a href="${record.uri}" target="_blank">View on Discogs</a>
