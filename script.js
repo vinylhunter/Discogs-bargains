@@ -1,40 +1,46 @@
-document.getElementById('searchForm').addEventListener('submit', async (e) => {
+const form = document.getElementById("search-form");
+const resultsDiv = document.getElementById("results");
+
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Get form values
-  const genre = document.getElementById('genre').value;
-  const format = document.getElementById('format').value;
-  const year = document.getElementById('year').value;
-  const condition = document.getElementById('condition').value;
+  const release_id = document.getElementById("release_id").value.trim();
+  const genre = document.getElementById("genre").value.trim();
+  const format = document.getElementById("format").value.trim();
+  const year = document.getElementById("year").value.trim();
 
-  const resultsDiv = document.getElementById('results');
-  resultsDiv.innerHTML = '<p>Loading...</p>';
+  resultsDiv.innerHTML = "Loading...";
 
   try {
-    // Replace this URL with your Worker deployment URL if different
-    const workerURL = 'https://weathered-boat-3ab5.russellcliffe.workers.dev/';
+    // Build query URL for Worker
+    const params = new URLSearchParams();
+    if (release_id) params.append("release_id", release_id);
+    if (genre) params.append("genre", genre);
+    if (format) params.append("format", format);
+    if (year) params.append("year", year);
 
-    const params = new URLSearchParams({ genre, format, year, condition });
-    const res = await fetch(`${workerURL}?${params.toString()}`);
+    const workerUrl = `https://weathered-boat-3ab5.russellcliffe.workers.dev/?${params.toString()}`;
+    const res = await fetch(workerUrl);
     const data = await res.json();
 
-    if (!data.length) {
-      resultsDiv.innerHTML = '<p>No bargains found.</p>';
+    if (!data.release) {
+      resultsDiv.innerHTML = "<p>No results found.</p>";
       return;
     }
 
-    // Display results
-    resultsDiv.innerHTML = '';
-    data.forEach(item => {
-      const div = document.createElement('div');
-      div.classList.add('result-item');
-      div.innerHTML = `
-        <strong>${item.title}</strong> (${item.year})<br>
-        Format: ${item.format} | Condition: ${item.condition} | Price: $${item.price.value}<br>
-        <a href="${item.marketplace_url}" target="_blank">View on Discogs</a>
-      `;
-      resultsDiv.appendChild(div);
-    });
+    const release = data.release;
+    let html = `<h2>${release.title} (${release.year})</h2>`;
+    html += `<p>Genres: ${release.genres.join(", ")}</p>`;
+
+    if (release.formats.length > 0) {
+      html += "<h3>Formats:</h3><ul>";
+      release.formats.forEach(f => {
+        html += `<li>${f.name} - ${f.descriptions.join(", ")}</li>`;
+      });
+      html += "</ul>";
+    }
+
+    resultsDiv.innerHTML = html;
 
   } catch (err) {
     resultsDiv.innerHTML = `<p>Error: ${err.message}</p>`;
