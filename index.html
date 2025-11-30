@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  <h1>DISCOGS BARGAIN HUNTER</h1>
+  <h1>Undervalued Records Finder</h1>
 
   <form id="searchForm">
     <label>Genre:</label>
@@ -41,6 +41,7 @@
 
     form.addEventListener('submit', async e => {
       e.preventDefault();
+
       const genre = document.getElementById('genre').value;
       const format = document.getElementById('format').value;
       const year = document.getElementById('year').value;
@@ -48,7 +49,6 @@
       resultsDiv.innerHTML = 'Searching...';
 
       try {
-        // Replace '/api/search' with your Worker URL
         const workerUrl = `https://weathered-boat-3ab5.russellcliffe.workers.dev/?genre=${genre}&format=${format}&year=${year}`;
         const res = await fetch(workerUrl);
         const data = await res.json();
@@ -59,6 +59,7 @@
         }
 
         resultsDiv.innerHTML = '';
+
         data.results.forEach(record => {
           const div = document.createElement('div');
           div.classList.add('record');
