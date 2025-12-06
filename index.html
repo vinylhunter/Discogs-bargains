@@ -42,14 +42,17 @@
       const genre = document.getElementById('genre').value;
       const format = document.getElementById('format').value;
       const year = document.getElementById('year').value;
+
       const params = new URLSearchParams({ genre, format });
       if(year) params.append('year', year);
 
-      const res = await fetch(`https://weathered-boat-3ab5.russellcliffe.workers.dev//bargains?${params}`);
+      const workerUrl = 'https://weathered-boat-3ab5.russellcliffe.workers.dev/bargains'; // <-- Replace with your Worker URL
+      const res = await fetch(`${workerUrl}?${params}`);
       const data = await res.json();
 
       const tbody = document.querySelector('#results tbody');
       tbody.innerHTML = '';
+
       data.forEach(r => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
