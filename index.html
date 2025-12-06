@@ -11,7 +11,7 @@
   </style>
 </head>
 <body>
-  <h1>Discogs Bargain Hunter</h1>
+  <h1>Discogs Bargain Hunter2</h1>
 
   <label>Genre: <input id="genre" value="Rock"></label>
   <label>Format: 
@@ -46,14 +46,17 @@
       const params = new URLSearchParams({ genre, format });
       if(year) params.append('year', year);
 
-      const workerUrl = 'https://weathered-boat-3ab5.russellcliffe.workers.dev/bargains'; // <-- Replace with your Worker URL
-      const res = await fetch(`${workerUrl}?${params}`);
+      // Replace with your Worker URL
+      const workerUrl = 'https://weathered-boat-3ab5.russellcliffe.workers.dev/bargains';
+
+      // Add cache-busting query
+      const res = await fetch(`${workerUrl}?${params}&cb=${Date.now()}`);
       const data = await res.json();
 
       const tbody = document.querySelector('#results tbody');
       tbody.innerHTML = '';
 
-      data.forEach(r => {
+      data.results.forEach(r => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${r.title}</td>
@@ -64,6 +67,8 @@
         `;
         tbody.appendChild(tr);
       });
+
+      console.log(data.debug); // Confirm Worker deployment
     };
   </script>
 </body>
