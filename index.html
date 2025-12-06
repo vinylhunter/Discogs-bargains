@@ -1,65 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Discogs Bargain Hunter</title>
   <style>
-    body { font-family: sans-serif; margin: 20px; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ddd; padding: 8px; }
-    th { background-color: #f4f4f4; }
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #eee; }
   </style>
 </head>
 <body>
   <h1>Discogs Bargain Hunter</h1>
-  <form id="searchForm">
-    Genre: <input type="text" name="genre">
-    Format: <input type="text" name="format">
-    Year: <input type="text" name="year">
-    Condition: <input type="text" name="condition">
-    <button type="submit">Search</button>
-  </form>
-  <br>
-  <table id="resultsTable">
+
+  <label>Genre: <input id="genre" value="Rock"></label>
+  <label>Format: 
+    <select id="format">
+      <option>Vinyl</option>
+      <option>7"</option>
+      <option>CD</option>
+    </select>
+  </label>
+  <label>Year: <input id="year" placeholder="Optional"></label>
+  <button id="search">Search</button>
+
+  <table id="results">
     <thead>
       <tr>
         <th>Title</th>
-        <th>Condition</th>
-        <th>Price</th>
-        <th>Median</th>
+        <th>Year</th>
+        <th>Median Price</th>
+        <th>Lowest Price</th>
         <th>% Below Median</th>
-        <th>Link</th>
       </tr>
     </thead>
-    <tbody id="resultsBody"></tbody>
+    <tbody></tbody>
   </table>
 
   <script>
-    const form = document.getElementById('searchForm');
-    const resultsBody = document.getElementById('resultsBody');
+    document.getElementById('search').onclick = async () => {
+      const genre = document.getElementById('genre').value;
+      const format = document.getElementById('format').value;
+      const year = document.getElementById('year').value;
+      const params = new URLSearchParams({ genre, format });
+      if(year) params.append('year', year);
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      resultsBody.innerHTML = '<tr><td colspan="6">Loading...</td></tr>';
-      const params = new URLSearchParams(new FormData(form));
-      const res = await fetch(`/api/bargains?${params.toString()}`);
+      const res = await fetch(`https://weathered-boat-3ab5.russellcliffe.workers.dev//bargains?${params}`);
       const data = await res.json();
 
-      if (data.length === 0) {
-        resultsBody.innerHTML = '<tr><td colspan="6">No bargains found</td></tr>';
-        return;
-      }
-
-      resultsBody.innerHTML = data.map(item => `
-        <tr>
-          <td>${item.title}</td>
-          <td>${item.condition}</td>
-          <td>$${item.price}</td>
-          <td>$${item.median}</td>
-          <td>${item.percentBelow}%</td>
-          <td><a href="${item.url}" target="_blank">View Listing</a></td>
-        </tr>
-      `).join('');
-    });
+      const tbody = document.querySelector('#results tbody');
+      tbody.innerHTML = '';
+      data.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.title}</td>
+          <td>${r.year || ''}</td>
+          <td>${r.median_price}</td>
+          <td>${r.lowest_price}</td>
+          <td>${r.discount_percent}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    };
   </script>
 </body>
 </html>
